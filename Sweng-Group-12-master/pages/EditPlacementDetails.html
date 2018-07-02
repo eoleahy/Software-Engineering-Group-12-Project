@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<title>Edit Placement Details</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="../css/style.css">
+</head>
+
+<body onload="receivePlacement()">
+  <div class="sidenav">
+     <a onClick=sendDetails() href="ViewPlacementDetails.html">Back</a>
+  </div>
+  <div class="main">
+    <h2>Edit Placement Details</h2>
+    <p>Placement Number: <b id="id"></b></p>
+    <div class="container">
+      <form action="saved.html" onsubmit="go()">
+        <!--    <input type="text" id="id" name="id" value="90">-->
+        <label for="name">Name</label>
+        <input type="text" id="name" name="name" value="">
+        <label for="location">Location</label>
+        <input type="text" id="location" name="location" value="">
+        <label for="county">County</label>
+        <input type="text" id="county" name="county" value="">
+        <label for="places">Total Places</label>
+        <input type="text" id="places" name="places" value="">
+        <a class="saveBtn" onclick="check()">Save</a>
+        <div id="popup1" class="overlay">
+          <div class="popup">
+            <h1>Changes saved</h1>
+            <a class="close" href="#">&times;</a>
+          </div>
+        </div>
+      </form>
+      <script>
+          
+        var data;
+
+        //Receives placement from the data embedded in the href sent from view placement page
+        function receivePlacement() {
+          var placement = decodeURIComponent(window.location.search);
+          data = placement;
+          placement = placement.substring(1);
+          var newString = placement.replace("place=<td>", "");
+          var splitString = newString.split("</td><td>");
+          document.getElementById("id").innerHTML = splitString[0];
+          document.getElementById("location").value = splitString[2];
+          document.getElementById("places").value = splitString[1];
+          document.getElementById("county").value = splitString[3]
+          document.getElementById("name").value = splitString[4].replace("</td>", "");
+        }
+
+        //Sends details back to view placement page by embedding it in the href
+        function sendDetails() {
+
+          var qs = data;
+          window.location.href = "ViewPlacementDetails.html" + qs;
+          console.log("data sent to veiew");
+        }
+        //Checks that all boxes are filled in before saving the data to the file
+        function check() {
+
+          var id = document.getElementById("id").innerHTML;
+          var loc = document.getElementById("location").value;
+          var county = document.getElementById("county").value;
+          var placesLeft = document.getElementById("places").value;
+          var name = document.getElementById("name").value;
+
+          if (loc == "") {
+            alert("No Location!");
+          } else if (county == "") {
+            alert("No County!");
+          } else if (placesLeft == "") {
+            alert("No Place Numbers!");
+          } else if (name == "") {
+            alert("No name!");
+          } else {
+
+            alert("Changes Saved");
+            window.location.href = "workplacelist.html";
+            editPlacement();
+          }
+        }
+      </script>
+        
+      <script type="text/javascript" src="../main.js"></script>
+        
+    </div>
+  </div>
+</body>
+</html>

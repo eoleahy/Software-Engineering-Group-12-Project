@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <title>Workplace List</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script>
+        if (typeof module === 'object') {
+            window.module = module;
+            module = undefined;
+        }
+    </script>
+    <!-- <script src="../node_modules/jquery/dist/jquery.min.js"></script> -->
+    <script>
+        if (window.module) module = window.module;
+    </script>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="../css/style.css">
+    <script src ="../main.js"></script>
+
+    <script>
+        window.jQuery = window.$ = require('jquery');
+    </script>
+    <!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script> -->
+
+</head>
+
+<body>
+    <!-- sidebar nagitation HTML -->
+    <div class="sidenav">
+        <a href="studentlist.html">Student List</a>
+        <a href="workplacelist.html" class="active">Workplace List</a>
+        <button id = "assignbutton" onClick="assignAll()" >Assign</button>
+    </div>
+
+
+
+
+    <div class="main">
+        <div class="container">
+            <!-- Data table -->
+            <div class="table-responsive">
+                <h1 align="center">Placement List</h1>
+                <br />
+                <div align="center">
+                    <button type="button" name="load_data" id="load_data" class="btn btn-info">Load Data</button>
+                    <button class="btn btn_available" id="available_btn" onclick="filterPlacements()" placeholder="Available" title="See available places">Available</button>
+                </div>
+                <!-- Available Button -->
+
+                <br />
+                <p>Double click on a placement to view or edit its details.</p>
+                <!-- Table search -->
+
+                <input class="input" type="text" id="myInput" onkeyup="searchTable()" placeholder="Search by Placement ID..." title="Type in an ID">
+                <div class="rowPlacements" id="parsed_csv_list">
+                    <div class="row" id="parsed_csv_list">
+                    </div>
+                    <div id="placements_table">
+                    </div>
+                </div>
+            </div>
+        </div>
+</body>
+
+<!-- Display the data in html table -->
+<script>
+    //prduce html table from .csv file 
+    $(document).ready(function () {
+        $('#load_data').click(function () {
+            $.ajax({
+                url: "../Placements.csv",
+                dataType: "text",
+                success: function (data) {
+                    var employee_data = data.split(/\r?\n|\r/);
+                    var table_data = '<table id="placementTable" class="table table-bordered table-striped">';
+                    var row = '<tr class = "clickable-row" name="load_page" onClick = "getTable()">'
+                    for (var count = 0; count < employee_data.length; count++) {
+                        var cell_data = employee_data[count].split(",");
+                        table_data += row;
+                        for (var cell_count = 0; cell_count < cell_data.length; cell_count++) {
+                            if (count === 0) {
+                                table_data += '<th>' + cell_data[cell_count] + '</th>';
+                            } else {
+                                table_data += '<td>' + cell_data[cell_count] + '</td>';
+                            }
+                        }
+                        table_data += '</tr>';
+                    }
+                    table_data += '</table>';
+                    $('#placements_table').html(table_data);
+                }
+            });
+        });
+
+    });
+
+    function getTable() {
+         //Get list of rows in the table
+         var table = document.getElementById("placements_table");
+         var rows = table.getElementsByTagName("tr");
+
+         var selectedRow;
+
+         //Row callback; reset the previously selected row and select the new one
+         function SelectRow(row) {
+             if (selectedRow !== undefined) {
+
+                 console.log(selectedRow.innerHTML);
+                 var workplaceId = selectedRow.cells[0].innerHTML;
+                 console.log(workplaceId);
+                 sendDetails(selectedRow.innerHTML);
+             }
+             selectedRow = row;
+
+         }
+
+         //Attach this callback to all rows
+         for (var i = 0; i < rows.length; i++) {
+             (function (idx) {
+                 addEvent(rows[idx], "click", function () {
+                     SelectRow(rows[idx]);
+                 });
+             })(i);
+         }
+
+         function addEvent(element, evt, callback) {
+       if (element.addEventListener) {
+           element.addEventListener(evt, callback, false);
+       } else if (element.attachEvent) {
+           element.attachEvent("on" + evt, callback);
+       } else {
+           element["on" + evt] = callback;
+       }
+   }
+ };
+    //send placement details to view placement 
+     function sendDetails(placement) {
+       var qs = "?place=" + placement;
+       console.log("View placements HAS BEEN CALLED");
+       window.location.href="ViewPlacementDetails.html" + qs;
+
+}
+    //search table by ID 
+    function searchTable() {
+        var input, filter, table, tr, td, i;
+        input = document.getElementById("myInput");
+        filter = input.value.toUpperCase();
+        table = document.getElementById("placementTable");
+        tr = table.getElementsByTagName("tr");
+        for (i = 0; i < tr.length; i++) {
+            td = tr[i].getElementsByTagName("td")[0];
+            if (td) {
+                if (td.innerHTML.toUpperCase().indexOf(filter) > -1) {
+                    tr[i].style.display = "";
+                } else {
+                    tr[i].style.display = "none";
+                }
+            }
+        }
+    }
+    //filter html table to only show placements that still have available places
+    function filterPlacements() {
+        //console.log("FILTER CALLED !!!!!!!!!!!!!!!!!!!!!");
+        var input, filter, table, tr, td, i;
+        table = document.getElementById("placementTable");
+        tr = table.getElementsByTagName("tr");
+        for (i = 1; i < tr.length; i++) {
+            td = tr[i].getElementsByTagName("td")[1];
+            if (td) {
+                if (td.innerHTML > 0) {
+                    tr[i].style.display = "";
+                } else {
+                    tr[i].style.display = "none";
+                }
+            }
+        }
+    }
+</script>

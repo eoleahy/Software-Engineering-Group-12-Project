@@ -1,0 +1,31 @@
+{
+  "name": "sweng-group-12",
+  "version": "1.0.0",
+  "description": "Allocation system for Students going on work placements",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-packager . StudentAllocator"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Donegaan/Sweng-Group-12.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Donegaan/Sweng-Group-12/issues"
+  },
+  "homepage": "https://github.com/Donegaan/Sweng-Group-12#readme",
+  "devDependencies": {
+    "electron": "^1.7.12",
+    "electron-packager": "^11.2.0"
+  },
+  "dependencies": {
+    "convert-json-to-csv": "^1.0.0",
+    "csvjson": "^5.0.0",
+    "jquery": "^3.3.1",
+    "jsonfile": "^4.0.0",
+    "npm": "^5.8.0"
+  }
+}

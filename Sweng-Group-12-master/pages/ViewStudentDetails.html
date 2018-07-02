@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>ViewStudentDetails</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="../css/style.css">
+</head>
+    
+<body onload="receiveStudent()">
+<div class="sidenav">
+  <a href="studentlist.html">Back</a>
+</div>
+    
+<div class="main">
+    <h2>Student Details</h2>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+    table {
+        border-collapse: collapse;
+        border-spacing: 0;
+        width: 100%;
+        border: 1px solid #ddd;
+    }
+    th, td {
+        text-align: left;
+        padding: 16px;
+    }
+    tr:nth-child(even) {
+        background-color: #f2f2f2
+    }
+</style>
+
+<a href="EditStudentDetails.html">
+<button  class="editBtn" type="button" id="editPlacement" onclick = sendDetails()><i class="fa fa-edit" ></i>Edit</button></a>
+    
+<table id="student-list">
+  <tr>
+    <th>Student Number</th>
+    <th>Name</th>
+    <th>Year</th>
+    <th>Location</th>
+    <th>Current Placement</th>
+    <th>County</th>
+  </tr>
+   <tr>
+    <td id = "id"></td>
+    <td id = "name"></td>
+    <td id = "year"></td>
+    <td id = "location"></td>
+    <td id = "currPlace"></td>
+    <td id = "county"></td>
+  </tr>
+</table>
+    
+ <h2>Placement History</h2>
+    <table id ="history">
+      <tr>
+        <th>ID</th>
+        <th>Name</th>
+        <th>Location</th>
+    </table>
+</div>
+<script type="text/javascript" src="../main.js"></script>
+<script>
+    var data;
+    var id;
+    var studentInfo;
+    var prevPlacement;
+    
+    //Receives student data embedded in the href
+  function receiveStudent(){
+    var student = decodeURIComponent(window.location.search);
+    data = student;
+    student=student.substring(1);
+    var newString = student.replace("stud=<td>", "");
+    const splitString = newString.split("</td><td>");
+    id = splitString[0];
+    console.log(id);
+
+    //Getting the specific students info;
+    var students = getStudentData();
+    for(i=0;i<students.length;i++)
+    {
+      if (students[i]["Number"] === id){
+        studentInfo = students[i];
+        break;
+      }
+    }
+      
+    //Loading their previous placements
+    var pastPlacementsList = getPrevPlacementData();
+    for(i=0;i<pastPlacementsList.length;i++)
+    {
+        if(pastPlacementsList[i]["Student Number"] === id){
+          prevPlacement = pastPlacementsList[i];
+        }
+    }
+    document.getElementById("id").innerHTML =  id;
+    document.getElementById("name").innerHTML =  studentInfo["Name"];
+    document.getElementById("year").innerHTML =  studentInfo["Year"];
+    document.getElementById("location").innerHTML =  studentInfo["Location"];
+    document.getElementById("currPlace").innerHTML =  studentInfo["Allocated Placement"];
+    document.getElementById("county").innerHTML =  studentInfo["County"];
+    createTable();
+    }
+    
+    // Generates a table with the required information
+    function createTable(){
+      //Getting the relevant data for our table
+      var placements = getPlacementData();
+      var ids = [prevPlacement["Placement 1 ID"], prevPlacement["Placement 2 ID"], prevPlacement["Placement 3 ID"]];
+      var pastPlacementWithInfo=[];
+      for(i=0;i<placements.length;i++){
+        if(placements[i]["id"]===ids[0]||
+          placements[i]["id"]===ids[1]||
+          placements[i]["id"]===ids[2]){
+
+          pastPlacementWithInfo.push(placements[i]);
+        }
+      }
+      var table = document.getElementById("history");
+      var tableBody = document.createElement("tbody");
+
+      //Creating table rows
+
+      for(r=0; r<pastPlacementWithInfo.length; r++){
+        var row = document.createElement("tr");
+
+        //Repeatedly create the data for the cells for each row
+        var cell = document.createElement("td");
+        var text = pastPlacementWithInfo[r]["id"];
+        var celltext = document.createTextNode(text);
+        cell.appendChild(celltext);
+        row.appendChild(cell);
+        tableBody.appendChild(row);
+
+        cell = document.createElement("td");
+        text = pastPlacementWithInfo[r]["Name"];
+        celltext = document.createTextNode(text);
+        cell.appendChild(celltext);
+        row.appendChild(cell);
+        tableBody.appendChild(row);
+
+        cell = document.createElement("td");
+        text = pastPlacementWithInfo[r]["Location"];
+        celltext = document.createTextNode(text);
+        cell.appendChild(celltext);
+        row.appendChild(cell);
+        table.appendChild(row);
+      }
+    }
+    //Sends the student details to the Edit Student page to be displayed
+    function sendDetails()
+    {
+    var qs = data;
+    window.location.href="EditStudentDetails.html" + qs;
+  }
+</script>
+</body>
+</html>

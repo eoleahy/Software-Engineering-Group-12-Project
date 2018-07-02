@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+  <script>
+    if (typeof module === 'object') {
+      window.module = module;
+      module = undefined;
+    }
+  </script>
+  <!-- <script src="../node_modules/jquery/dist/jquery.min.js"></script> -->
+
+  <script>
+    if (window.module) module = window.module;
+  </script>
+  <link href="../css/style.css" rel="stylesheet">
+  <title>Student List</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script src ="../main.js"></script>
+  <script>
+    window.jQuery = window.$ = require('jquery');
+  </script>
+  <!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script> -->
+</head>
+
+<body>
+  <!--Side bar navigation html   -->
+
+  <div class="sidenav">
+    <a class="active" href="studentlist.html">Student List</a> <a href="workplacelist.html">Workplace List</a> <button id="assignbutton" onclick="assignAll()">Assign</button>
+  </div>
+  <div class="main">
+    <div class="container">
+      <!-- Data table -->
+      <div class="table-responsive">
+        <h1 align="center">Student List</h1><br>
+        <div align="center">
+          <button type="button" name="load_data" id="load_data" class="btn btn-info">Load Data</button>
+        </div>
+        <br />
+        
+        <p>Double click on a student to view or edit their details.</p>
+        <!-- Table seach bar -->
+        <input class="input" type="text" id="myInput" onkeyup="searchTable()" placeholder="Search by Student ID..." title="Type in an ID">
+        <!-- place for table -->
+        <div class="rowStudents" id="parsed_csv_list">
+          <div class="row" id="parsed_csv_list"></div>
+          <div id="student_table"></div>
+        </div>
+      </div>
+    </div>
+    <!-- Display the data in html table -->
+    <script>
+      $(document).ready(function() {
+        $('#load_data').click(function() {
+          $.ajax({
+            url: "../Students.csv",
+            dataType: "text",
+            success: function(data) {
+              var employee_data = data.split(/\r?\n|\r/);
+              var table_data = '<table class="table table-bordered table-striped" id="table">';
+              var row = '<tr class = "clickable-row" name="load_page" onClick = "getTable()">'
+              for (var count = 0; count < employee_data.length; count++) {
+                var cell_data = employee_data[count].split(",");
+                table_data += row;
+                for (var cell_count = 0; cell_count < cell_data.length; cell_count++) {
+
+                  if (count === 0) {
+                    table_data += '<th>' + cell_data[cell_count] + '<\/th>';
+                  } else {
+                    table_data += '<td>' + cell_data[cell_count] + '<\/td>';
+                  }
+                }
+                table_data += '<\/tr>';
+              }
+              table_data += '<\/table>';
+              $('#student_table').html(table_data);
+            }
+          });
+        });
+      });
+
+      //This function is used in determining which row had been clicked so we can send info on to the next page
+      function getTable() {
+        //Get list of rows in the table
+        var table = document.getElementById("student_table");
+        var rows = table.getElementsByTagName("tr");
+
+        var selectedRow;
+
+        //Row callback; reset the previously selected row and select the new one
+        function SelectRow(row) {
+          if (selectedRow !== undefined) {
+
+
+            var studId = selectedRow.cells[0].innerHTML;
+            sendDetails(selectedRow.innerHTML);
+          }
+          selectedRow = row;
+
+        }
+
+        //Attach this callback to all rows
+        for (var i = 0; i < rows.length; i++) {
+          (function(idx) {
+            addEvent(rows[idx], "click", function() {
+              SelectRow(rows[idx]);
+            });
+          })(i);
+        }
+
+        //Adds event listners for the row
+        function addEvent(element, evt, callback) {
+          if (element.addEventListener) {
+            element.addEventListener(evt, callback, false);
+          } else if (element.attachEvent) {
+            element.attachEvent("on" + evt, callback);
+          } else {
+            element["on" + evt] = callback;
+          }
+        }
+      };
+
+      //Function to send details on the the view details page
+      function sendDetails(student) {
+        var qs = "?stud=" + student;
+        window.location.href = "ViewStudentDetails.html" + qs;
+      }
+
+
+      //Function for the search functionality
+      function searchTable() {
+        var input, filter, table, tr, td, i;
+        input = document.getElementById("myInput");
+        filter = input.value.toUpperCase();
+        table = document.getElementById("student_table");
+        tr = table.getElementsByTagName("tr");
+        for (i = 0; i < tr.length; i++) {
+          td = tr[i].getElementsByTagName("td")[0];
+          if (td) {
+            if (td.innerHTML.toUpperCase().indexOf(filter) > -1) {
+              tr[i].style.display = "";
+            } else {
+              tr[i].style.display = "none";
+            }
+          }
+        }
+      }
+    </script>
+  </div>
+</body>
+
+</html>

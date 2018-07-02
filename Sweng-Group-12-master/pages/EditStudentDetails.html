@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<title>Edit Student Details</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="../css/style.css">
+</head>
+
+<body onload="receiveStudent()">
+
+  <div class="sidenav">
+    <a onClick=sendDetails() href="ViewStudentDetails.html">Back</a>
+  </div>
+
+  <div class="main">
+    <h2>Edit Student Details </h2>
+    <p>Student Number: <b id="id"></b></p>
+    <div class="container">
+      <form action="saved.html" onsubmit="go()">
+        <label for="name">Full Name</label>
+        <input type="text" id="name" name="name" value="">
+        <label for="year">Year</label>
+        <input type="text" id="year" name="year" value="">
+        <label for="location">Location</label>
+        <input type="text" id="location" name="location" value="">
+        <label for="county">County</label>
+        <input type="text" id="county" name="county" value="">
+        <label for="places">Current Placement ID</label>
+        <input type="text" id="currPlace" name="currPlace" value="">
+        <a class="saveBtn" onclick="check()">Save</a>
+        <div id="popup1" class="overlay">
+          <div class="popup">
+            <h1>Changes saved</h1>
+            <a class="close" href="#">&times;</a>
+          </div>
+        </div>
+      </form>
+      <script>
+          
+        var data;
+
+        //Receives student data embedded in the href
+        function receiveStudent() {
+          var student = decodeURIComponent(window.location.search);
+          data = student;
+          student = student.substring(1);
+          var newString = student.replace("stud=<td>", "");
+          var splitString = newString.split("</td><td>");
+          document.getElementById("id").innerHTML = splitString[0];
+          document.getElementById("name").value = splitString[1];
+          document.getElementById("year").value = splitString[2];
+          document.getElementById("location").value = splitString[3];
+          document.getElementById("county").value = splitString[4];
+          document.getElementById("currPlace").value = splitString[5].replace("</td>", "");
+        }
+
+        //Embeds the student details in the href
+        function sendDetails() {
+          var qs = data;
+          window.location.href = "ViewStudentDetails.html" + qs;
+          console.log("data sent to veiew");
+        }
+
+        //Checks to see if the boxes have been left blank before saving the data to the file
+        function check() {
+          var btn = document.getElementById("save");
+          var savePopup = document.getElementById("popup1");
+          var studentName = document.getElementById("name").value;
+          var studentYr = document.getElementById("year").value;
+          var studentLoc = document.getElementById("location").value;
+          var studentCounty = document.getElementById("county").value;
+          var curPlace = document.getElementById("currPlace").value;
+
+          if (studentName == "") {
+            alert("No name!");
+          } else if (studentYr == "") {
+            alert("No year!");
+          } else if (studentCounty == "") {
+            alert("No county!");
+          } else if (studentLoc == "") {
+            alert("No location!");
+          } else if (curPlace == "") {
+            alert("No placement!");
+          } else {
+
+            alert("Changes Saved");
+            window.location.href = "studentlist.html";
+            editStudent();
+          }
+        }
+      </script>
+      <script type="text/javascript" src="../main.js">
+      </script>
+    </div>
+  </div>
+</body>
+</html>

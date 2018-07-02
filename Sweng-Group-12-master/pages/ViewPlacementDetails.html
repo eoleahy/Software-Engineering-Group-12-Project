@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>ViewPlacementDetails</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+</head>
+<body onload="receiveWorkplace()">
+    <div class="sidenav">
+        <a href="workplacelist.html">Back</a>
+    </div>
+    <div class="main">
+        <h2>Placement Details</h2>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <style>
+            table {
+                border-collapse: collapse;
+                border-spacing: 0;
+                width: 100%;
+                border: 1px solid #ddd;
+            }
+            th,
+            td {
+                text-align: left;
+                padding: 16px;
+            }
+            tr:nth-child(even) {
+                background-color: #f2f2f2
+            }
+        </style>
+
+        <a href="EditPlacementDetails.html">
+            <button class="editBtn" type="button" id="editPlacement" onclick=sendDetails()>
+                <i class="fa fa-edit"></i> Edit</button></a>
+        <table>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Places Available</th>
+                <th>Location</th>
+                <th>County</th>
+            </tr>
+            <tr>
+                <td id="id"></td>
+                <td id="name"></td>
+                <td id="place"></td>
+                <td id="loc"></td>
+                <td id="county"></td>
+            </tr>
+        </table>
+
+        <div id="mapCanvas" style="width:100%;height:400px;"></div>
+        <div>Map does not work for Dublin area codes</div>
+        
+        
+        
+        <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBGrIpLfAxR0NDgSODLhzH5f7I2bJgXdMs&callback=initMap">
+        </script>
+        <script>
+            
+            var data;
+            //Receives placement data embedded in the href
+            function receiveWorkplace() {
+                var place = decodeURIComponent(window.location.search);
+                data = place;
+                place = place.substring(1);
+                console.log(place);
+
+                var newString = place.replace("place=<td>", "");
+                const splitString = newString.split("</td><td>");
+                var whole = splitString;
+                var placeId = splitString[0];
+                var name = splitString[4]
+                var county = splitString[3];
+                var location = splitString[2];
+                var places = splitString[1];
+                document.getElementById("id").innerHTML = placeId;
+                document.getElementById("county").innerHTML = county;
+                document.getElementById("loc").innerHTML = location;
+                document.getElementById("place").innerHTML = places;
+                document.getElementById("name").innerHTML = name;
+            }
+            //Sends the placement details to the Edit Placement page to be displayed
+            function sendDetails() {
+                console.log(data);
+                var qs = data;
+                window.location.href = "EditPlacementDetails.html" + qs;
+            }
+            //------- Google maps stuff
+            function initMap() {
+                var geocoder = new google.maps.Geocoder();
+                var latlng = new google.maps.LatLng(53.3498, -6.2603);
+                var mapOptions = {
+                    zoom: 8,
+                    center: latlng,
+                    componentRestrictions: {
+                        country: "ire"
+                    }
+                }
+                var map = new google.maps.Map(document.getElementById('mapCanvas'), mapOptions);
+                codeAddress(geocoder, map);
+            }
+            function codeAddress(geocoder, resultsMap) {
+                // var address = "Maynooth";
+                var place = decodeURIComponent(window.location.search);
+                place = place.substring(1);
+                var newString = place.replace("place=<td>", "");
+                const splitString = newString.split("</td><td>");
+                var address = splitString[2]; // get placement location from table info
+                geocoder.geocode({
+                    'address': address
+                }, function (results, status) {
+                    if (status === 'OK') {
+                        resultsMap.setCenter(results[0].geometry.location);
+                        var marker = new google.maps.Marker({
+                            map: resultsMap,
+                            position: results[0].geometry.location,
+							title: address
+                        });
+                    } else {
+                        alert('Geocode was not successful for the following reason: ' + status);
+                    }
+                });
+            }
+        </script>
+    </div>
+</body>
+
+</html>
